@@ -30,7 +30,7 @@ const profileSchema = new Schema({
         twitter: String,
         github: String
     },
-    post: [
+    posts: [
         {
             type: Schema.Types.ObjectId,
             ref: 'Post'

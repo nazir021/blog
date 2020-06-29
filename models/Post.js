@@ -10,7 +10,8 @@ const postSchema = new Schema({
     },
     body:{
         type: String,
-        required: true
+        required: true,
+        maxlength: 5000
     },
     author: {
         type: Schema.Types.ObjectId,
@@ -39,6 +40,18 @@ const postSchema = new Schema({
     ]
 },{
     timestamps:true
+})
+
+postSchema.index({
+    title :'text',
+    body:'text' ,
+    tag :'text' 
+},{
+    weights : {
+        title : 5 ,
+        tags : 5,
+        body : 3
+    }
 })
 
 const Post = model('Post', postSchema)

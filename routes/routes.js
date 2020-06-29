@@ -2,6 +2,12 @@ const authRoute = require('./authRoute')
 const validatorRoutes = require('../playground/validator')
 const dashboardRoute = require('./dashboardRoute')
 const uploadRoute = require('./uploadRoute')
+const postRoute = require('./postRoute')
+const explorerRoute = require('./explorerRoute')
+const searchRoute = require('./searchRoute')
+const authorRoute = require('./authorRoute')
+
+const apiRoutes = require('../api/routes/apiRoute')
 
 const routes = [
     {
@@ -17,15 +23,33 @@ const routes = [
         handler: uploadRoute
     },
     {
+        path:'/posts',
+        handler: postRoute
+    },
+    {
+        path:'/api',
+        handler: apiRoutes
+    },
+    {
+        path:'/explorer',
+        handler: explorerRoute
+    },
+    {
+        path:'/search',
+        handler: searchRoute
+    },
+    {
+        path:'/author',
+        handler: authorRoute
+    },
+    {
         path:'/playground',
         handler: validatorRoutes
     },
     {
         path:'/',
         handler: (req,res)=>{
-            res.json({
-                message: 'updating your site'
-            })
+            res.redirect('/explorer')
         }
     }
 ]
