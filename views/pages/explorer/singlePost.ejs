@@ -9,7 +9,7 @@
                     <div class="d-flex">
                         <small>
                             <%= moment(post.createdAt) %>,
-                            Posted By <a href="/author/<%=post.author._id%>"><%= post.author.username.toUpperCase() %></a> ,
+                            Posted By <a href="/author/<%=post.author._id%>"><%= post.author.username%></a> ,
                             <%= post.readTime %>
                         </small>
                         <% if(user) { %>
@@ -46,6 +46,10 @@
                             <button class="btn btn-danger btn-sm" id="dislikeBtn" data-post="<%= post._id %>">
                                 <%= post.dislikes.includes(user._id) ? 'Disliked' : 'Dislike' %> ( <%= post.dislikes.length %> )
                             </button>
+                               <% if(user.isAdmin){%>
+                                <a href="/posts/edit/<%= post._id %> " class="btn btn-success" style="font-size: 12px;">Edit</a>
+                                <% } %>
+                              
                             <div class="mt-5">
                                 <label for="comment">Leave a comment</label>
                                 <input type="text" class="form-control" id="comment"

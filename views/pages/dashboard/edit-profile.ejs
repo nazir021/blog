@@ -39,6 +39,11 @@
                                 <div class="form-group">
                                     <label for="name">Enter your name</label>
                                     <input 
+                                     style="display:none;"
+                                    id="id"
+                                    value="<%= profile.user %>"
+                                    >
+                                    <input 
                                         type="text"
                                         class="form-control <%= error.name ?'is-invalid' : '' %> " 
                                         name="name"

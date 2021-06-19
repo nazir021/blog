@@ -1,8 +1,19 @@
-<div id="sidebar" class="my-5">
-    <ul class="list-group">
-        <li class="list-group-item">
-            <a href="/dashboard">Dashboard</a>
-        </li>
+<div id="sidebar" class="my-5 text-left" style="background-color: darkcyan;" >
+    <ul class="list-group" >
+        
+            
+            <%if( user.isAdmin == true){%>
+                <li class="list-group-item">
+            
+                  <a class="nav-link"style="font-size: 15px" href="/dashboard/admin-dashboard">Admin Dashboard</a>
+                </li>
+             <% }  else{%>
+                <li class="list-group-item">
+             
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+              </li>
+        <%  }%>
+  
         <li class="list-group-item">
             <a href="/posts/create">New Post</a>
         </li>

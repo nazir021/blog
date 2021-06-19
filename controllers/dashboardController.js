@@ -3,9 +3,37 @@ const Flash = require('../utils/Flash')
 const Profile = require('../models/Profile')
 const User = require('../models/User')
 const Comment = require('../models/Comment')
+const Posts = require('../models/Post')
 const errorFormatter = require('../utils/ErrorValidation')
 
 exports.dashboradGetController = async (req,res,next) =>{
+    try{
+        
+        let profile = await Profile.findOne({user: req.user._id})
+        .populate({
+            path : 'posts',
+            select : 'title thumbnail'
+        })
+        .populate({
+            path : 'bookmarks',
+            select : 'title thumbnail'
+        })
+        // let status = profile.status
+        if(profile){
+            return res.render('pages/dashboard/dashboard', { 
+                title:'My Dashboard',
+                flashMessage: Flash.getMessage(req),
+                posts : profile.posts.reverse().slice(0,3) ,
+                bookmarks : profile.bookmarks.reverse().slice(0,3),
+                // status
+            })
+        }
+    }catch(err){
+        next(err);
+    }
+    res.redirect('/dashboard/create-profile')
+}
+exports.adminDashboradGetController = async (req,res,next) =>{
     try{
         let profile = await Profile.findOne({user: req.user._id})
         .populate({
@@ -16,12 +44,19 @@ exports.dashboradGetController = async (req,res,next) =>{
             path : 'bookmarks',
             select : 'title thumbnail'
         })
+        let users = await Profile.find()
+        let allPosts = await Posts.find()
+
+      
         if(profile){
-            return res.render('pages/dashboard/dashboard', { 
-                title:'My Dashboard',
+             
+            return res.render('pages/dashboard/admin-dashboard', { 
+                title:'Admin Dashboard',
                 flashMessage: Flash.getMessage(req),
                 posts : profile.posts.reverse().slice(0,3) ,
-                bookmarks : profile.bookmarks.reverse().slice(0,3)
+                bookmarks : profile.bookmarks.reverse().slice(0,3),
+                Totalusers : users.length,
+                allPosts : allPosts.length
             })
         }
     }catch(err){
@@ -29,6 +64,29 @@ exports.dashboradGetController = async (req,res,next) =>{
     }
     res.redirect('/dashboard/create-profile')
 }
+
+exports.allUserGetController = async (req,res,next) =>{
+    try{
+       
+        let users = await Profile.find()
+        if(users){
+             
+            return res.render('pages/dashboard/allUsers', { 
+                title:'All Users',
+                flashMessage: Flash.getMessage(req),
+                posts :users ,
+
+            })
+        }
+    }catch(err){
+        next(err);
+    }
+    res.redirect('/dashboard/create-profile')
+}
+
+
+
+
 
 exports.createProfileGetController = async (req,res,next)=>{
     try{
@@ -116,6 +174,26 @@ exports.editProfileGetController = async (req,res,next)=>{
         next(err)
     }
 }
+exports.admidEditProfileGetController = async (req,res,next)=>{
+    
+    try{
+        let profile = await Profile.findOne({_id: req.params.id})
+        let userInfo = await User.findOne({_id:profile.user})
+      
+        if(!profile){
+            return res.redirect('/dashboard/create-profile')
+        }
+        res.render('pages/dashboard/adminEditUser',{
+            title:'Edit Your Profile',
+            error:{},
+            flashMessage: Flash.getMessage(req),
+            profile,
+            email :userInfo.email ,
+        })
+    }catch(err){
+        next(err)
+    }
+}
 exports.editProfilePostController = async (req,res,next)=>{
     let errors = validationResult(req).formatWith(errorFormatter)
     //console.log(errors.mapped());
@@ -180,6 +258,104 @@ exports.editProfilePostController = async (req,res,next)=>{
         next(e)
     }
 }
+exports.AdminEditProfilePostController = async (req,res,next)=>{
+    let errors = validationResult(req).formatWith(errorFormatter)
+    //console.log(errors.mapped());
+
+    let {
+        name,
+        title,
+        id,
+        bio,
+        website,
+        facebook,
+        twitter,
+        github
+     } = req.body
+
+    if(!errors.isEmpty()){
+        req.flash('fail','Please provide valid data')
+        return res.render('pages/dashboard/create-profile',
+        {
+            title : 'Create your profile' ,
+            flashMessage : Flash.getMessage(req) ,
+            error : errors.mapped(),
+            profile : {
+                name,
+                title,
+                bio,
+                links : {
+                    website,
+                    facebook,
+                    twitter,
+                    github
+                }
+            }
+        })
+    }
+    try {
+        let profile = {
+            name,
+            title,
+            id,
+            bio,
+            links : {
+                website:website || '',
+                facebook : facebook || '' ,
+                twitter : twitter || '' ,
+                github : github || ''
+            }
+        }
+        let updatedProfile = await Profile.findOneAndUpdate(
+            { _id : id},
+            { $set : profile}, 
+            { new : true}
+        )
+        
+        req.flash('success','Profile Updated Successfully')
+        // res.render('pages/dashboard/adminEditUser',{
+        //     title : 'Edit your profile' ,
+        //     error : {},
+        //     flashMessage : Flash.getMessage(req) ,            
+        //     profile: updatedProfile
+        // })
+        res.redirect('/dashboard/admin-dashboard')
+
+    } catch (e) {      
+        next(e)
+    }
+}
+// block user
+exports.blockUser = async (req,res,next)=>{
+   
+       let pro = await Profile.findOne({ _id : req.params.id})
+       if(pro.status == 'Unblocked'){
+        await Profile.findOneAndUpdate(
+            { _id : req.params.id},
+            { 'status' : "Blocked"}, 
+           
+        )
+       }else{
+         await Profile.findOneAndUpdate(
+            { _id : req.params.id},
+            { 'status' : "Unblocked"}, 
+           
+        )
+       }
+
+        req.flash('success','Profile Updated Successfully')
+        // res.render('pages/dashboard/adminEditUser',{
+        //     title : 'Edit your profile' ,
+        //     error : {},
+        //     flashMessage : Flash.getMessage(req) ,            
+        //     profile: updatedProfile
+        // })
+        res.redirect('/dashboard/admin-dashboard')
+
+  
+}
+
+
 
 
 exports.bookmarksGetController =async (req,res,next) =>{
@@ -198,6 +374,16 @@ exports.bookmarksGetController =async (req,res,next) =>{
        next(e) 
     }
 }
+exports.deleteUser =async (req,res,next) =>{
+    try {
+        await Profile.remove({ _id : req.params.id})
+        await User.remove({ _id : req.params.id})
+         res.redirect('/dashboard/admin-dashboard')  
+    } catch (e) {
+       next(e) 
+    }
+}
+
 
 exports.commentsGetController =async (req,res,next) =>{
     try {

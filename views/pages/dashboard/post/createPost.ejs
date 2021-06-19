@@ -36,7 +36,14 @@
                                 <label for="inputGroupFile" class="custom-file-label">Choose File</label>
                             </div>
                         </div>
+                        <%if(status == "Blocked"){%>
+                            <h5>You Are <span style="color: red;">Blocked</span> </h5>
+                      <%  }else{ %>
                         <input type="submit" class="btn btn-primary" value="Create Post"/>
+                        
+                       
+                      <%}%>
+                      
                     </form>
                 </div>
             </div>

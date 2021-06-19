@@ -10,7 +10,7 @@ const setLocals = require('./setLocals')
 
 const MONGODB_URI = `mongodb+srv://${config.get('db-username')}:${config.get('db-password')}@cluster0-pprwo.mongodb.net/test?retryWrites=true&w=majority`
 const store = new MongoDBStore({
-    uri: MONGODB_URI,
+    uri: `mongodb://localhost/blog`,
     collection: 'sessions',
     expires: 1000*60*60*2
   });

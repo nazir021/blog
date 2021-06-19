@@ -1,4 +1,5 @@
 const User = require('../models/User')
+const Admin = require('../models/Admin')
 const bcrypt = require('bcrypt')
 const {validationResult} = require('express-validator')
 const errorFormatter = require('../utils/ErrorValidation')
@@ -14,6 +15,7 @@ exports.signupGetController = (req,res,next) =>{
         flashMessage: Flash.getMessage(req)
     })
 }
+
 exports.signupPostController = async (req,res,next) =>{
 
     let {username,email,password} = req.body
@@ -51,6 +53,66 @@ exports.signupPostController = async (req,res,next) =>{
         // console.log(err);
         next(err)
     }
+}
+// admin login
+exports.signupAdminPostController = async (req,res,next) =>{
+ console.log("....................",req.body);
+ let {email,password} = req.body
+
+ // let isLoggedIn = req.get('Cookie').includes('isLoggedIn=true') ? true : false
+ //res.render('pages/auth/login', {title:'Login to your Account' ,error:{}})
+
+ let errors = validationResult(req).formatWith(errorFormatter)
+ 
+ if(!errors.isEmpty()){
+     //return console.log(errors.mapped()) 
+     req.flash('fail','Please Fill up the form Correctly')
+     return res.render('pages/auth/login', { 
+         title:'Login to your Account' ,
+         error:errors.mapped(),
+         flashMessage: Flash.getMessage(req)
+     } )
+ }
+
+ try{
+    console.log("....................",email);
+     let user = await User.findAll()
+     console.log('user admin',user);
+     if(!user){
+         req.flash('fail','Please Provide Correct Mail')
+         return res.render('pages/auth/adminLogin', { 
+             title:'Login to your Account' ,
+             error:{},
+             flashMessage: Flash.getMessage(req)
+         } )
+     }
+    //  let matchedPassword = await bcrypt.compare(password, user.password)
+    //  if(!matchedPassword){
+    //      req.flash('fail','Please Provide Correct Password')
+    //      return res.render('pages/auth/login', { 
+    //          title:'Login to your Account' ,
+    //          error:{},
+    //          flashMessage: Flash.getMessage(req)
+    //      } )
+    //  }
+     //res.setHeader('Set-Cookie', 'isLoggedIn=true')
+     // Session must be REQ Method
+     req.session.isLoggedIn = true
+     req.session.user=user
+     req.session.save(err=>{
+         if(err){
+             console.log(err);
+             return next(err)
+         }
+         req.flash('success','Succesfully Logged In')
+         res.redirect('/dashboard')
+     })
+     
+ }catch(err){
+     // console.log(err);
+     next(err)
+ }
+ 
 }
 exports.loginGetController = (req,res,next) =>{
     //let isLoggedIn = req.get('Cookie').includes('isLoggedIn=true') ? true : false
@@ -108,8 +170,15 @@ exports.loginPostController = async (req,res,next) =>{
                 console.log(err);
                 return next(err)
             }
-            req.flash('success','Succesfully Logged In')
-            res.redirect('/dashboard')
+            if(user.isAdmin){
+                
+                req.flash('success','Succesfully Logged In')
+                res.redirect('/dashboard/admin-dashboard')
+            }else{
+                req.flash('success','Succesfully Logged In')
+                res.redirect('/dashboard')
+            }
+           
         })
         
     }catch(err){
@@ -175,4 +244,14 @@ exports.changePasswordPostController = async (req,res,next) => {
     } catch (e) {
        next(e) 
     }    
+}
+// admin login
+exports.signupAdminController = (req,res,next) =>{
+    
+    res.render('pages/auth/admin-dashboard', { 
+        title:'Create An Account', 
+        error:{},
+        value:{},
+        flashMessage: Flash.getMessage(req)
+    })
 }

@@ -23,6 +23,9 @@ const userSchema = new Schema({
     profilePic : {
         type:String,
         default: '/uploads/default.jpg'
+    },isAdmin:{
+        type:Boolean,
+        default:false
     }
 },{
     timestamps: true

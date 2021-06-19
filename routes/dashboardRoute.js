@@ -8,7 +8,13 @@ const {
     editProfileGetController,
     editProfilePostController,
     bookmarksGetController,
-    commentsGetController
+    commentsGetController,
+    adminDashboradGetController,
+    allUserGetController,
+    admidEditProfileGetController,
+    AdminEditProfilePostController,
+    deleteUser,
+    blockUser
 } = require('../controllers/dashboardController')
 
 
@@ -19,8 +25,18 @@ router.get('/create-profile',isAuthenticated,createProfileGetController)
 router.post('/create-profile',isAuthenticated,profileValidator,createProfilePostController)
 
 router.get('/edit-profile',isAuthenticated,editProfileGetController)
+router.get('/adminEditUser/:id',isAuthenticated,admidEditProfileGetController)
+
+
 router.post('/edit-profile',isAuthenticated,profileValidator,editProfilePostController)
+router.post('/adminEditUser',isAuthenticated,profileValidator,AdminEditProfilePostController)
+
 
 router.get('/',isAuthenticated, dashboradGetController)
+router.get('/allUsers',isAuthenticated, allUserGetController)
+router.get('/admin-dashboard',isAuthenticated, adminDashboradGetController)
+
+router.get('/deleteUser/:id',isAuthenticated,deleteUser)
+router.get('/blockUser/:id',isAuthenticated, blockUser)
 
 module.exports  = router

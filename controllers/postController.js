@@ -7,16 +7,25 @@ const Post = require('../models/Post')
 const Profile = require('../models/Profile')
 
 
-exports.createPostGetController = (req,res,next)=>{
+exports.createPostGetController = async(req,res,next)=>{
+    let user =   await Profile.findOne(
+        {user: req.user._id},
+    )
     res.render('pages/dashboard/post/createPost',{
         title:'Create Your Post', 
         error:{},
         flashMessage: Flash.getMessage(req),
-        value: {}
+        value: {},
+        status : user.status
     })
 }
 
 exports.createPostPostController = async (req,res,next)=>{
+  let user =   await Profile.findOne(
+        {user: req.user._id},
+    )
+    
+   if(user.status == 'Unblocked'){
     let {title,body,tags} = req.body
     let errors = validationResult(req).formatWith(errorFormatter)
     if(!errors.isEmpty()){
@@ -28,7 +37,8 @@ exports.createPostPostController = async (req,res,next)=>{
                 title,
                 body,
                 tags
-            }
+            },
+         
         })
     }
     if(tags){
@@ -65,14 +75,17 @@ exports.createPostPostController = async (req,res,next)=>{
     }catch(err){
         next(err)
     }
+}else{
+    res.redirect('/dashboard')
+}
 }
 
 exports.editPostGetController =async (req,res,next) => {
     let postId = req.params.postId
 
     try {
-        let post =await Post.findOne({author : req.user._id , _id : postId})     
-        
+        let post =await Post.findOne({ _id : postId})     
+       
         if(!post){
             let error = new Error('404 Page not found')
             error.status = 404
@@ -97,7 +110,7 @@ exports.editPostPostController =async (req,res,next) => {
     let errors = validationResult(req).formatWith(errorFormatter)
     
     try {
-        let post =await Post.findOne({author : req.user._id , _id : postId})            
+        let post =await Post.findOne({ _id : postId})            
         
         if(!post){
             let error = new Error('404 Page not found')

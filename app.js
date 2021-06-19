@@ -81,7 +81,7 @@ app.use((error,req,res,next)=>{
 })
 
 const PORT = process.env.PORT || 4000
-mongoose.connect(MONGODB_URI,{useNewUrlParser:true , useUnifiedTopology: true })
+mongoose.connect(`mongodb://localhost/blog`,{useNewUrlParser:true , useUnifiedTopology: true })
     .then(()=>{
         console.log('Database Connected 2');
         app.listen(PORT,()=>{
@@ -91,6 +91,8 @@ mongoose.connect(MONGODB_URI,{useNewUrlParser:true , useUnifiedTopology: true })
     .catch(err=>{
         return  console.log(err);
     })
+
+  
 
 // mongodb+srv://nazir:<password>@cluster0-pprwo.mongodb.net/test?retryWrites=true&w=majority
 

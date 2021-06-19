@@ -18,6 +18,7 @@ const routes = [
         path:'/dashboard',
         handler: dashboardRoute
     },
+  
     {
         path:'/uploads',
         handler: uploadRoute

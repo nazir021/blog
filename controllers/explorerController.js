@@ -1,6 +1,7 @@
 const Flash = require('../utils/Flash')
 const Post = require('../models/Post')
 const Profile = require('../models/Profile')
+const User = require('../models/User')
 const moment = require('moment')
 
 function generateDate(days){
@@ -88,6 +89,7 @@ exports.singlePostGetController = async (req,res,next) => {
 
     try {
         let post = await Post.findById(postId)
+        let user = await User.findById(post.author)
         .populate('author','username profilePic')
         .populate({
             path : 'comments',  
@@ -104,6 +106,7 @@ exports.singlePostGetController = async (req,res,next) => {
             }
 
         })
+      
         if(!post){
             let error = new Error('404 Page Not Found')
             error.status = 404
@@ -121,7 +124,8 @@ exports.singlePostGetController = async (req,res,next) => {
             title : post.title ,
             flashMessage : Flash.getMessage(req),
             post,
-            bookmarks
+            bookmarks,
+            admin : user.isAdmin
         })
 
     } catch (e) {

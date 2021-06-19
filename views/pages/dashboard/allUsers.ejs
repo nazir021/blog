@@ -1,0 +1,49 @@
+<%- include('../../partials/header.ejs')%>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.4/croppie.css">
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2"> 
+            <%- include('../../partials/sidebar.ejs')%>
+        </div>
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-8 offset-md-2 my-5"> 
+                    <h5>All Authors</h5>                                               
+                    <div class="row">                            
+                        
+                            <% for(let post of posts ) { %>
+                                <div class="card col-sm-3 m-2">
+                                   
+                                        <img src="<%= post.profilePic %>" alt="userName" class="card-img-top mt-3">
+                                    
+                                    <div class="card-body">
+                                        <!-- <a href="/explorer/<%= post._id %>" style="color: #222;"> -->
+                                            <h5>Name : <%= post.name %></h5>
+                                            <p>Profession : <%= post.title %></p>
+                                            <p> Status : <%= post.status %></p>
+                                        <!-- </a> -->
+                                        <div style="margin-top:20px" class="text-left">
+                                            <a href="/dashboard/adminEditUser/<%= post.id %>" class="btn btn-success" style="font-size: 15px;">Action</a>
+                                        </div>
+                                      
+                                    </div>
+                                </div>  
+                                      
+                            <% } %>
+
+                    </div>
+                </div>
+                
+            </div>
+          
+        </div>
+    </div>
+    
+
+<%- include('../../partials/footer.ejs')%> 
+
+
+</body>
+</html>

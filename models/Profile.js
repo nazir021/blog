@@ -13,6 +13,10 @@ const profileSchema = new Schema({
         maxlength: 50,
         required: true
     },
+    status:{
+        type :String,
+        default :"Unblocked" 
+    },
     title : {
         type: String,
         trim: true,
